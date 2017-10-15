@@ -5,12 +5,14 @@ metadata:
   labels:
     app: nginx
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
   - port: 80
+    nodePort: 32211
     protocol: TCP
     name: http
   - port: 443
+    nodePort: 30028
     protocol: TCP
     name: https
   selector:
@@ -30,7 +32,7 @@ spec:
       volumes:
       - name: secret-volume
         secret:
-          secretName: nginxsecret
+          secretName: generic-nginx-secret
       - name: configmap-volume
         configMap:
           name: nginxconfigmap

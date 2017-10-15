@@ -9,7 +9,12 @@ It uses an [nginx server block](http://wiki.nginx.org/ServerBlockExample) to ser
 First generate a self signed rsa key and certificate that the server can use for TLS. This step invokes the make_secret.go script in the same directory, which uses the kubernetes api to generate a secret json config in /tmp/secret.json.
 
 ```sh
-$ make keys secret KEY=/tmp/nginx.key CERT=/tmp/nginx.crt SECRET=/tmp/secret.json
+$ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx.key -out nginx.crt -subj "/CN=nginxsvc/O=nginxsvc"
+Generating a 2048 bit RSA private key
+................+++
+................+++
+writing new private key to 'nginx.key'
+-----
 ```
 
 ### Create a https nginx application running in a kubernetes cluster
@@ -19,8 +24,8 @@ You need a [running kubernetes cluster](../../docs/getting-started-guides/) for 
 Create a secret and a configmap.
 
 ```sh
-$ kubectl create -f /tmp/secret.json
-secret "nginxsecret" created
+$ kubectl create secret generic nginx-secret --key nginx.key --cert nginx.crt
+secret "nginx-secret" created
 
 $ kubectl create configmap nginxconfigmap --from-file=examples/https-nginx/default.conf
 configmap "nginxconfigmap" created
